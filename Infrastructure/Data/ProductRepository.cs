@@ -23,9 +23,12 @@ namespace Infrastructure.Data
 
         public async Task<PaginatedResult<Product>> GetProductsAsync(GetProductsModel model)
         {
+            var brands = model.brand?.Split(",");
+            var types = model.type?.Split(",");
+
             var products = _context.Products.Where(item => 
-            (string.IsNullOrEmpty(model.brand) || item.Brand == model.brand) && 
-            (string.IsNullOrEmpty(model.type) || item.Type == model.type) &&
+            (string.IsNullOrEmpty(model.brand) || (brands != null && brands.Any(b => b == item.Brand))) && 
+            (string.IsNullOrEmpty(model.type) || (types != null && types.Any(t => t == item.Type))) &&
             (string.IsNullOrEmpty(model.Search) || item.Name.ToLower().Contains(model.Search)));
 
             products = model.sortType switch

@@ -18,7 +18,7 @@ namespace Core.Models.RequestModels
         public string Search
         {
             get => _search ?? "";
-            set => _search = value.Trim().ToLower();
+            set => _search = value?.Trim().ToLower();
         }
     }
 }

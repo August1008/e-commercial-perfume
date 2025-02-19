@@ -22,6 +22,7 @@ namespace Core.Helper
             PageNumber = pageNumber < minPageNumber ? minPageNumber : pageNumber;
             PageSize = pageSize < 1 || pageSize > 50 ? maxPageSize : pageSize;
             TotalCount = query.Count();
+            PageSize = PageSize > TotalCount ? TotalCount : PageSize;
             Items = query.Skip(this.PageSize * (this.PageNumber - 1)).Take(this.PageSize).ToList();
         }
     }

@@ -46,7 +46,7 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 app.UseMiddleware<ErrorHandlingMiddleware>();
-app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200", "https://localhost:4200"));
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200", "https://localhost:4200", "https://proud-beach-00b131300.4.azurestaticapps.net"));
 app.MapControllers();
 
 using(var scope = app.Services.CreateScope())

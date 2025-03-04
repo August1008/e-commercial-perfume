@@ -28,8 +28,14 @@ builder.Services.AddCors();
 
 builder.Services.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(config =>
 {
-    var connection = builder.Configuration.GetConnectionString("Redis") ?? throw new Exception("Cannot connect redis server!");
-    var configuration = ConfigurationOptions.Parse(connection, true);
+    var Endpoint = builder.Configuration.GetValue<string>("RedisSetting:Endpoint") ?? throw new Exception("Cannot connect redis server!");
+
+    ConfigurationOptions configuration = new ConfigurationOptions
+    {
+        EndPoints = { Endpoint },
+        Password = builder.Configuration.GetValue<string>("RedisSetting:Password"),
+        Ssl = true
+    };
     return ConnectionMultiplexer.Connect(configuration);
 });
 

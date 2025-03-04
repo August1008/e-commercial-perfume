@@ -8,7 +8,7 @@ namespace Core.Entities.Redis
 {
     public class ShoppingCart
     {
-        public required Guid Id { get; set; }
+        public required string Id { get; set; }
         public List<CartItem> CartItems { get; set; } = [];
     }
 }

@@ -18,38 +18,65 @@ namespace Infrastructure.Services
             _redisDatabase = redisConnection.GetDatabase();
         }
 
-        public async Task<ShoppingCart?> CreateCartAsync(ShoppingCart cart)
+        public async Task<ShoppingCart?> CreateOrUpdateCartAsync(ShoppingCart cart)
         {
-            if (cart == null) { return  null; }
-            var cartData = JsonSerializer.Serialize<ShoppingCart>(cart);
-            var expiration = TimeSpan.FromMinutes(10);
-            var cartKey = GetCartKey(cart.Id);
-            var result = await _redisDatabase.StringSetAsync(cartKey, cartData, expiry: expiration);
-            if (result) return cart;
+            if (cart != null)
+            {
+                cart.Id = IsValidCartKey(cart.Id) ? cart.Id : Guid.NewGuid().ToString();
+                var cartData = JsonSerializer.Serialize<ShoppingCart>(cart);
+                var expiration = TimeSpan.FromDays(10);
+                var cartKey = GetCartKey(cart.Id);
+                var result = await _redisDatabase.StringSetAsync(cartKey, cartData, expiry: expiration);
+                if (result) return cart;
+            }
             return null;
         }
 
-        public Task<bool> DeleteCartAsync(string cartId)
+        public async Task<bool> DeleteCartAsync(string cartId)
         {
-            throw new NotImplementedException();
+            return await _redisDatabase.KeyDeleteAsync(GetCartKey(cartId));
         }
 
-        public Task<bool> FlushCartAsync(string cartId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<ShoppingCart> GetShoppingCartAsync(Guid cartId)
+        public async Task<bool> FlushCartAsync(string cartId)
         {
             var cartkey = GetCartKey(cartId);
             var cartData = await _redisDatabase.StringGetAsync(cartkey);
+            if (!cartData.IsNullOrEmpty)
+            {
+                var cart = JsonSerializer.Deserialize<ShoppingCart>(cartData);
+                cart.CartItems.Clear();
+
+                var updatedCartData = JsonSerializer.Serialize<ShoppingCart>(cart);
+                var cartKey = GetCartKey(cartId);
+                return await _redisDatabase.StringSetAsync(cartKey, updatedCartData);
+            }
+            return false;
+
+        }
+
+        public async Task<ShoppingCart?> GetShoppingCartAsync(string cartId)
+        {
+            var cartkey = GetCartKey(cartId);
+            var cartData = await _redisDatabase.StringGetAsync(cartkey);
+            if (cartData.IsNullOrEmpty) return null;
             var cart = JsonSerializer.Deserialize<ShoppingCart>(cartData);
             return cart;
         }
 
-        private string GetCartKey(Guid cartId)
+
+
+        #region private 
+
+        private string GetCartKey(string cartId)
         {
-            return $"Cart:{cartId.ToString()}";
+            return $"cart:{cartId}";
         }
+
+        private bool IsValidCartKey(string cartKey)
+        {
+            return !string.IsNullOrEmpty(cartKey) && Guid.TryParse(cartKey, out Guid id);
+        }
+
+        #endregion
     }
 }

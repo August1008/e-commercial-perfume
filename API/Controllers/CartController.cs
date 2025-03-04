@@ -17,7 +17,7 @@ namespace API.Controllers
         }
 
         [HttpGet("get-cart/{cartId:guid}")]
-        public async Task<IActionResult> GetCart(Guid cartId)
+        public async Task<IActionResult> GetCart(string cartId)
         {
             var cart = await _cartService.GetShoppingCartAsync(cartId);
             if (cart == null)
@@ -27,19 +27,27 @@ namespace API.Controllers
             return Ok(cart);
         }
 
-        [HttpPost("create-cart")]
-        public async Task<IActionResult> CreateCart()
+        [HttpPost("create-or-update")]
+        public async Task<IActionResult> CreateOrUpdateCart([FromBody]ShoppingCart shoppingCart)
         {
-            var newCart = new ShoppingCart()
-            {
-                Id = Guid.NewGuid()
-            };
-            var cart = await _cartService.CreateCartAsync(newCart);
+            //var newCart = new ShoppingCart()
+            //{
+            //    Id = Guid.NewGuid()
+            //};
+            var cart = await _cartService.CreateOrUpdateCartAsync(shoppingCart);
             if (cart != null)
             {
                 return Ok(cart);
             }
             return BadRequest();
+        }
+
+        [HttpDelete("delete/{id:guid}")]
+        public async Task<IActionResult> DeleteCart(string id)
+        {
+            var result = await _cartService.DeleteCartAsync(id);
+            if (result) return NoContent();
+            return BadRequest("Cart deletion has a problem");
         }
     }
 }

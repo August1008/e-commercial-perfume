@@ -3,6 +3,9 @@ using Core.Entities;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.BearerToken;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 using System.Text.Json;
@@ -34,10 +37,18 @@ builder.Services.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(con
     {
         EndPoints = { Endpoint },
         Password = builder.Configuration.GetValue<string>("RedisSetting:Password"),
-        Ssl = true
+        //Ssl = true
     };
     return ConnectionMultiplexer.Connect(configuration);
 });
+
+
+builder.Services.AddAuthorization();
+builder.Services.AddIdentityApiEndpoints<AppUser>(options =>
+{
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(1);
+})
+    .AddEntityFrameworkStores<StoreContext>();
 
 var app = builder.Build();
 
@@ -54,7 +65,7 @@ app.UseAuthorization();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200", "https://localhost:4200", "https://proud-beach-00b131300.4.azurestaticapps.net"));
 app.MapControllers();
-
+app.MapGroup("api").MapIdentityApi<AppUser>();
 using(var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<StoreContext>();

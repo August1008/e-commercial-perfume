@@ -1,6 +1,7 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
 using Core.Models.RequestModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -17,6 +18,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetProducts([FromQuery]GetProductsModel model)
         {
             var products = await _productRepository.GetProductsAsync(model);
@@ -45,7 +47,7 @@ namespace API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProduct([FromBody]CreateProductModel model)
+        public async Task<IActionResult> CreateProduct([FromBody]ProductCreationModel model)
         {
             var product = new Product
             {

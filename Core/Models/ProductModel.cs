@@ -1,26 +1,29 @@
-﻿using System;
+﻿using Core.Entities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Core.Models.RequestModels
+namespace Core.Models
 {
-    public class CreateProductModel
+    public class ProductModel
     {
+        public Guid Id { get; set; }
         [Required]
         [MaxLength(100)]
         public string Name { get; set; } = "Updating";
-        public string? Description { get; set; } = "Description";
+        public string? Description { get; set; }
         [Required]
-        [Range(0.0,1000000000.0, ErrorMessage ="Price is invalid")]
         public decimal Price { get; set; }
-        public string PictureUrl { get; set; } = "Default Url";
+        public string? PictureUrl { get; set; }
         [Required]
-        public string Type { get; set; } = "Type";
+        public string Type { get; set; } = "";
         [Required]
-        public string Brand { get; set; } = "Brand";
+        public string Brand { get; set; } = "";
         public int Quantity { get; set; }
+
     }
+
 }

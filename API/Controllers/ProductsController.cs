@@ -18,7 +18,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> GetProducts([FromQuery]GetProductsModel model)
         {
             var products = await _productRepository.GetProductsAsync(model);

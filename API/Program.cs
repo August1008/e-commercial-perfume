@@ -37,7 +37,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer, ConnectionMultiplexer>(con
     {
         EndPoints = { Endpoint },
         Password = builder.Configuration.GetValue<string>("RedisSetting:Password"),
-        //Ssl = true
+        Ssl = true
     };
     return ConnectionMultiplexer.Connect(configuration);
 });
